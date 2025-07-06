@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国際税率比較ツール</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .bg-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e5e7eb' fill-opacity='0.1'%3E%3Cpath d='M40 30c5.523 0 10 4.477 10 10s-4.477 10-10 10-10-4.477-10-10 4.477-10 10-10zm0 2c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #e0e7ff 100%);
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- ヘッダー -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center p-3 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-4">
+                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                国際税率比較ツール
+            </h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">
+                年収と投資収益を入力して、各国の税負担を比較しましょう
+            </p>
+        </div>
+
+        <!-- 入力フォーム -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-12 border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                </svg>
+                収入設定
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">年収（円）</label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                        <input
+                            type="number"
+                            id="income"
+                            value="10000000"
+                            class="w-full pl-10 pr-4 py-4 border-2 border-gray-200 rounded-lg text-lg font-semibold focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all"
+                            placeholder="10000000"
+                        />
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2" id="incomeDisplay">現在: ¥10,000,000</p>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">投資収益（円）</label>
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <input
+                            type="number"
+                            id="investment"
+                            value="5000000"
+                            class="w-full pl-10 pr-4 py-4 border-2 border-gray-200 rounded-lg text-lg font-semibold focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all"
+                            placeholder="5000000"
+                        />
+                    </div>
+                    <p class="text-sm text-gray-500 mt-2" id="investmentDisplay">現在: ¥5,000,000</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 簡易比較表 -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 mb-12 border border-gray-200">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+                税負担ランキング
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="rankingCards">
+                <!-- カードはJavaScriptで動的に生成 -->
+            </div>
+        </div>
+
+        <!-- 詳細比較表 -->
+        <div class="space-y-6">
+            <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                <div class="p-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                詳細比較
+            </h2>
+            
+            <div id="detailCards">
+                <!-- 詳細カードはJavaScriptで動的に生成 -->
+            </div>
+        </div>
+
+        <!-- フッター -->
+        <div class="mt-16 text-center text-gray-500">
+            <p>※ この計算は簡略化されたものです。実際の税額は個人の状況により異なります。</p>
+        </div>
+    </div>
+
+    <script>
+        // 税率データ
+        const taxRates = {
+            japan: {
+                name: '日本',
+                flag: '🇯🇵',
+                incomeTax: 0.45,
+                residentTax: 0.10,
+                corporateTax: 0.2384,
+                capitalGainsTax: 0.2031,
+                socialInsurance: 0.15,
+                inheritanceTax: 0.55,
+                color: 'bg-gradient-to-br from-red-50 via-pink-50 to-orange-50 border-red-300',
+                icon: '🗾'
+            },
+            singapore: {
+                name: 'シンガポール',
+                flag: '🇸🇬',
+                incomeTax: 0.22,
+                residentTax: 0,
+                corporateTax: 0.17,
+                capitalGainsTax: 0,
+                socialInsurance: 0.17,
+                inheritanceTax: 0,
+                color: 'bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 border-green-300',
+                icon: '🏙️'
+            },
+            dubai: {
+                name: 'ドバイ（UAE）',
+                flag: '🇦🇪',
+                incomeTax: 0,
+                residentTax: 0,
+                corporateTax: 0.09,
+                capitalGainsTax: 0,
+                socialInsurance: 0,
+                inheritanceTax: 0,
+                color: 'bg-gradient-to-br from-blue-50 via-sky-50 to-cyan-50 border-blue-300',
+                icon: '🏜️'
+            },
+            hongkong: {
+                name: '香港',
+                flag: '🇭🇰',
+                incomeTax: 0.17,
+                residentTax: 0,
+                corporateTax: 0.165,
+                capitalGainsTax: 0,
+                socialInsurance: 0.05,
+                inheritanceTax: 0,
+                color: 'bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50 border-purple-300',
+                icon: '🌃'
+            },
+            malaysia: {
+                name: 'マレーシア',
+                flag: '🇲🇾',
+                incomeTax: 0.30,
+                residentTax: 0,
+                corporateTax: 0.24,
+                capitalGainsTax: 0.10,
+                socialInsurance: 0.135,
+                inheritanceTax: 0,
+                color: 'bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 border-yellow-300',
+                icon: '🌴'
+            },
+            georgia: {
+                name: 'ジョージア',
+                flag: '🇬🇪',
+                incomeTax: 0.01,
+                residentTax: 0,
+                corporateTax: 0.01,
+                capitalGainsTax: 0,
+                socialInsurance: 0.02,
+                inheritanceTax: 0,
+                color: 'bg-gradient-to-br from-emerald-50 via-green-50 to-lime-50 border-emerald-300',
+                icon: '⛰️'
+            }
+        };
+
+        // 通貨フォーマッター
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('ja-JP', {
+                style: 'currency',
+                currency: 'JPY',
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // 税額計算
+        function calculateTaxes(country, income, investment) {
+            const data = taxRates[country];
+            const incomeTaxAmount = income * data.incomeTax;
+            const residentTaxAmount = income * data.residentTax;
+            const capitalGainsTaxAmount = investment * data.capitalGainsTax;
+            const socialInsuranceAmount = income * data.socialInsurance;
+            
+            return {
+                incomeTax: incomeTaxAmount,
+                residentTax: residentTaxAmount,
+                capitalGainsTax: capitalGainsTaxAmount,
+                socialInsurance: socialInsuranceAmount,
+                total: incomeTaxAmount + residentTaxAmount + capitalGainsTaxAmount + socialInsuranceAmount
+            };
+        }
+
+        // 結果計算とソート
+        function calculateResults() {
+            const income = parseFloat(document.getElementById('income').value) || 0;
+            const investment = parseFloat(document.getElementById('investment').value) || 0;
+            
+            const results = Object.keys(taxRates).map(country => {
+                const taxes = calculateTaxes(country, income, investment);
+                const data = taxRates[country];
+                return {
+                    country,
+                    ...data,
+                    ...taxes,
+                    effectiveRate: (taxes.total / (income + investment)) * 100
+                };
+            }).sort((a, b) => a.total - b.total);
+            
+            return results;
+        }
+
+        // ランキングカード生成
+        function generateRankingCards(results) {
+            const container = document.getElementById('rankingCards');
+            container.innerHTML = '';
+            
+            results.forEach((result, index) => {
+                const card = document.createElement('div');
+                card.className = `p-6 rounded-xl border-2 ${result.color} card-hover relative overflow-hidden`;
+                
+                card.innerHTML = `
+                    <div class="absolute top-2 right-2 opacity-30 text-3xl">${result.icon}</div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl">${result.flag}</span>
+                        <div>
+                            <h3 class="font-bold text-gray-800">${result.name}</h3>
+                            ${index === 0 ? '<span class="inline-flex items-center px-2 py-1 bg-green-500 text-white text-xs font-bold rounded-full">最安</span>' : ''}
+                        </div>
+                    </div>
+                    <div class="bg-white/70 p-3 rounded-lg">
+                        <p class="text-sm text-gray-600">総税負担額</p>
+                        <p class="text-xl font-bold text-gray-800">${formatCurrency(result.total)}</p>
+                        <p class="text-sm text-gray-600 mt-1">実効税率: ${result.effectiveRate.toFixed(1)}%</p>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // 詳細カード生成
+        function generateDetailCards(results) {
+            const container = document.getElementById('detailCards');
+            container.innerHTML = '';
+            
+            results.forEach((result, index) => {
+                const card = document.createElement('div');
+                card.className = `relative p-8 rounded-2xl border-2 ${result.color} shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden`;
+                
+                card.innerHTML = `
+                    <div class="absolute top-4 right-4 opacity-20 text-6xl">${result.icon}</div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-4xl">${result.flag}</span>
+                                    <span class="text-2xl">${result.icon}</span>
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-gray-800">${result.name}</h3>
+                                    ${index === 0 ? '<span class="inline-flex items-center px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold rounded-full shadow-lg">最安</span>' : ''}
+                                </div>
+                            </div>
+                            <div class="text-right bg-white/70 p-4 rounded-xl backdrop-blur-sm">
+                                <p class="text-sm text-gray-600 mb-1">実効税率</p>
+                                <p class="text-3xl font-bold text-gray-800">${result.effectiveRate.toFixed(1)}%</p>
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="bg-white/70 p-6 rounded-xl backdrop-blur-sm">
+                                <h4 class="flex items-center gap-2 font-bold mb-4 text-gray-800">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                    </svg>
+                                    税目別負担額
+                                </h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">所得税</span>
+                                        <span class="font-semibold">${formatCurrency(result.incomeTax)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">住民税</span>
+                                        <span class="font-semibold">${formatCurrency(result.residentTax)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">キャピタルゲイン税</span>
+                                        <span class="font-semibold">${formatCurrency(result.capitalGainsTax)}</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">社会保険料</span>
+                                        <span class="font-semibold">${formatCurrency(result.socialInsurance)}</span>
+                                    </div>
+                                    <div class="border-t pt-2 flex justify-between text-lg font-bold">
+                                        <span>合計</span>
+                                        <span class="text-red-600">${formatCurrency(result.total)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-white/70 p-6 rounded-xl backdrop-blur-sm">
+                                <h4 class="flex items-center gap-2 font-bold mb-4 text-gray-800">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                                    </svg>
+                                    税率情報
+                                </h4>
+                                <div class="space-y-3">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">所得税率</span>
+                                        <span class="font-semibold">${(result.incomeTax * 100).toFixed(1)}%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">法人税率</span>
+                                        <span class="font-semibold">${(result.corporateTax * 100).toFixed(1)}%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">相続税率</span>
+                                        <span class="font-semibold">${(result.inheritanceTax * 100).toFixed(1)}%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">社会保険料率</span>
+                                        <span class="font-semibold">${(result.socialInsurance * 100).toFixed(1)}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // 表示更新
+        function updateDisplay() {
+            const income = parseFloat(document.getElementById('income').value) || 0;
+            const investment = parseFloat(document.getElementById('investment').value) || 0;
+            
+            // 入力値の表示更新
+            document.getElementById('incomeDisplay').textContent = `現在: ${formatCurrency(income)}`;
+            document.getElementById('investmentDisplay').textContent = `現在: ${formatCurrency(investment)}`;
+            
+            // 計算結果の更新
+            const results = calculateResults();
+            generateRankingCards(results);
+            generateDetailCards(results);
+        }
+
+        // イベントリスナー
+        document.getElementById('income').addEventListener('input', updateDisplay);
+        document.getElementById('investment').addEventListener('input', updateDisplay);
+
+        // 初期表示
+        updateDisplay();
+    </script>
+</body>
+</html>
